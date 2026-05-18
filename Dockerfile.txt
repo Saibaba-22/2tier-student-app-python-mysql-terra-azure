@@ -1,0 +1,29 @@
+# Base image
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Create working directory
+WORKDIR /student
+
+# Copy application files
+COPY . /student
+
+# Install Python, venv, MySQL Server, and build tools
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    build-essential \
+    pkg-config \
+    default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m venv venv \
+    && ./venv/bin/pip install --upgrade pip \
+    && ./venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Expose application port
+EXPOSE 5000
+
+# Start the Python application
+CMD ["./venv/bin/python3", "app.py"]
